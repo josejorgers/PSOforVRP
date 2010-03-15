@@ -1,60 +1,61 @@
 import random
 
-def sort(s, d):
+def codify(perm):
+    M = max([max(r) for r in perm])
+    code = [-1]*(M+1)
+    c = 0
+    for i in range(len(perm)):
+        for j in range(len(perm[i])):
+            code[perm[i][j]] = c
+            c+=1
+    return code
 
-    for i in range(len(s)-1):
-        for j in range(i+1,len(s)):
-            if d[i][1] > d[j][1]:
-                s[i], s[j] = s[j], s[i]
-                d[i], d[j] = d[j], d[i]
+def lis(source, destination):
+    code = codify(source)
+    try:
+        counts = [[0 for _ in r] for r in destination]
+    except:
+        print(source)
+        print(destination)
+        raise Exception('No se nada!!!')
 
-def go_vs_stay(go, stay, used, mark, s, d, init, dest):
+    idx = [[-1 for _ in r] for r in destination]
+    dic = make_set(source)
+    seek = False
+    for i in range(0, len(destination)):
+        for j in range(0, len(destination[i])):
+            if i !=dic[destination[i][j]][0]:
+                continue
+            seek = True
+            start = code[destination[i][j]]
+            counts[i][j] = max(1,counts[i][j])
+            count = counts[i][j] + 1
+            for k in range(i, len(destination)):
+                for l in range(0, len(destination[k])):
+                    if (i==k and l <= j) or dic[destination[k][l]][0] != k:
+                        continue
+                    if start < code[destination[k][l]] and counts[k][l] < count:
+                        counts[k][l] = count
+                        idx[k][l] = (i,j)
+    return [] if not seek else get_subsequence(destination, idx, max_index(counts))
 
-    counted = [False]*(len(mark))
-    lbl = False
-    counter = 0
-    for st in stay:
-        for m in mark[st]:
-            if used[m]:
-                lbl = True
-                break
-            if not counted[m]:
-                counter+=1
-                counted[m] = True
+def max_index(counts):
+    index = 0
+    M = -1
+    for i in range(len(counts)):
+        for j in range(len(counts[i])):
+            if counts[i][j] > M:
+                index = (i,j)
+                M = counts[i][j]
+    return index
 
-        if lbl:
-            break
-    if lbl or counter <= len(stay):
-        for st in stay:
-            for m in mark[st]:
-                if not used[m]:
-                    s.append(init[m])
-                    d.append(dest[m])
-                    used[m] = True
-    else:
-        for st in stay:
-            if not used[st]:
-                s.append(init[st])
-                d.append(dest[st])
-                used[st] = True
+def get_subsequence(perm, idx, index):
 
-def is_rotation(r1, r2):
-
-    if len(r1) != len(r2):
-        return None
-    mod = len(r1)
-    idx = -1
-    for i in range(len(r1)):
-        if r1[i] == r2[0]:
-            idx = i
-            break
-    if idx == -1:
-        return None
-    for i in range(len(r2)):
-        if r2[i] != r1[(i+idx)%mod]:
-            return None
-    return idx if idx <= len(r1)-idx-1 else -len(r1)
-
+    if idx[index[0]][index[1]] == -1:
+        return [perm[index[0]][index[1]]]
+    l = get_subsequence(perm, idx, idx[index[0]][index[1]])
+    l.append(perm[index[0]][index[1]])
+    return l
 
 def clean_path(path):
     idx = 0
@@ -67,13 +68,12 @@ def clean_path(path):
 
 def make_set(destination):
 
-    M = max([max(r) for r in destination if r != []])
+    M = max([max(r) for r in destination])
     s = [-1]*(M+1)
 
     for i in range(len(destination)):
         for j in range(len(destination[i])):
             s[destination[i][j]] = (i,j)
-
     return s
 
 def parse_solutions(source, destination):
@@ -167,3 +167,8 @@ dicc = {
     'rarac' : apply_rarac,
     'rdre' : apply_rdre
 }
+
+if __name__ == '__main__':
+    p = [1,4,3,2,5,6]
+    code = [0,1,2,3,4,5,6]
+    print(lis(p,code))
