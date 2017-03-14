@@ -6,7 +6,7 @@ choices = ['rarb','rarac', 'rdre']
 class Particle:
 
     def __init__(self, solution, criteria, vrange=10):
-        self.solution = [[c for c in r] for r in solution]
+        self.solution = solution
         self.criteria = criteria
         self.own_best = [[c for c in r] for r in solution]
         self.vrange = vrange
@@ -21,12 +21,15 @@ class Particle:
     def move(self, swarm_best):
 
         to_opt = distances.distance(self.solution, swarm_best, self.criteria)
+        to_self = distances.distance(self.solution, self.own_best, self.criteria)
 
-        if not to_opt:
+        if not to_opt and to_self != None:
             target = self.own_best
 
+        elif not to_opt and not to_self:
+            target = self.solution
         else:
-            d_pbest = len(distances.distance(self.solution, self.own_best, self.criteria))
+            d_pbest = len(to_self)
             d_tbest = len(to_opt)
 
             ratio = d_tbest/(d_pbest + d_tbest)
@@ -38,8 +41,8 @@ class Particle:
 
         new_sol = path[min(self.v, len(path)-1)]
 
-        if self.v > len(target):
-            n = self.v-len(target)
+        if self.v > len(path):
+            n = self.v-len(path)
             for i in range(n):
                 tmp = [[c for c in r] for r in new_sol]
                 new_sol = utils.apply(tmp, self.criteria)

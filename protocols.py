@@ -5,14 +5,14 @@ demands = None
 
 capacity = None
 
-def objective_function(sol, penalty = 100):
+def objective_function(sol, penalty = 1000):
 
     if not matrix  or not capacity:
         raise Exception('The "matrix" and "capacity" variables must be set')
 
     result = 0
     for r in sol:
-        route_demand = sum([demands[c] for c in r])
+        route_demand = sum([demands[c-1] for c in r])
         exceed = max(0, route_demand-capacity)
         result += penalty*exceed
         prev = 0
