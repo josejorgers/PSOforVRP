@@ -3,7 +3,7 @@ import pso, protocols
 import random
 if __name__ == '__main__':
 
-    clients = 60#int(input('Number of clients: ' ))
+    clients = 100#int(input('Number of clients: ' ))
     demands = [0]
 
     for c in range(clients):
@@ -17,7 +17,7 @@ if __name__ == '__main__':
         for j in range(i+1, clients+1):
             if i==j:
                 continue
-            matrix[j][i] = matrix[i][j] = random.randint(1,10)#int(input('From %d to %d: ' % (i,j)))
+            matrix[j][i] = matrix[i][j] = max(i,j)#int(input('From %d to %d: ' % (i,j)))
 
     protocols.matrix = matrix
     protocols.demands = demands

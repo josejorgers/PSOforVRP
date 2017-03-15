@@ -1,7 +1,9 @@
-from Distance import ab_distance
+from Distance import ab_distance, swap_distance, subroute_distance
 
 distances = {
-    'rarb' : ab_distance.distance
+    'rarb' : ab_distance.distance,
+    'rarac' : swap_distance.distance,
+    'rdre' : subroute_distance.distance
 }
 
 def distance(source, destination, criteria):

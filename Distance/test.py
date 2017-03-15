@@ -1,7 +1,7 @@
 from Distance import utils,distances
 
-dest = [[3,2],[1]]#[[i for i in range(1,201)]]
-src =  [[1],[2],[3]]#[[i for i in range(200,0,-1)]]
+src = [[1,2,3,4,5]]#[[i for i in range(1,201)]]
+dest = [[3,5,1,2,4]]#[[i for i in range(200,0,-1)]]
 crit = 'raabrarbb'
 
 #################################

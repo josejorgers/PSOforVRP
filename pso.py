@@ -1,9 +1,11 @@
 import random, protocols
 from Distance import distances, utils
 
+choices = ['rarb','rarac','rdre']
+
 class Particle:
 
-    def __init__(self, solution, criteria = 'rarb', vrange=20):
+    def __init__(self, solution, criteria, vrange=10):
         self.solution = [[c for c in r] for r in solution]
         self.criteria = criteria
         self.own_best = [[c for c in r] for r in solution]
@@ -18,22 +20,29 @@ class Particle:
 
     def move(self, swarm_best):
 
-        d_pbest = len(distances.distance(self.solution, self.own_best, self.criteria))
-        d_tbest = len(distances.distance(self.solution, swarm_best, self.criteria))
+        to_opt = distances.distance(self.solution, swarm_best, self.criteria)
 
-        ratio = d_tbest/(d_pbest + d_tbest)
-        path1 = distances.distance(self.own_best, swarm_best, self.criteria)
-        idx = int(ratio*len(path1))
-        target = path1[idx]
+        if not to_opt:
+            target = self.own_best
+
+        else:
+            d_pbest = len(distances.distance(self.solution, self.own_best, self.criteria))
+            d_tbest = len(to_opt)
+
+            ratio = d_tbest/(d_pbest + d_tbest)
+            path1 = distances.distance(self.own_best, swarm_best, self.criteria)
+            idx = int(ratio*len(path1))
+            target = path1[idx]
 
         path = distances.distance(self.solution,target, self.criteria)
+
         new_sol = path[min(self.v, len(path)-1)]
 
         if self.v > len(target):
             n = self.v-len(target)
             for i in range(n):
                 tmp = [[c for c in r] for r in new_sol]
-                new_sol = utils.apply_rarb(tmp)
+                new_sol = utils.apply(tmp, self.criteria)
 
         self.v = random.randint(1,self.vrange)
         self.solution = self.edit_solution(new_sol)
@@ -64,7 +73,7 @@ def random_sol(clients):
 def init(clients, N):
     particles = []
     for s in range(N):
-        particles.append(Particle(random_sol(clients)))
+        particles.append(Particle(random_sol(clients), random.choice(choices)))
     return particles
 
 
@@ -85,4 +94,6 @@ def pso(clients, N=100, iterations = 100):
             if protocols.objective_function(s) < protocols.objective_function(opt):
                 opt = [[c for c in r]for r in s]
         it-=1
-    return opt
+    solve = [[c for c in r] for r in opt if r != []]
+
+    return solve
