@@ -81,7 +81,7 @@ def preprocess(source, destination):
     d.reverse()
     return s,d
 
-def step(S, src, s, d, modif, dict, counter):
+def step(S, src, s, d, modif, counter):
 
     ss = s.pop()
     idx = ss[1]
@@ -91,9 +91,6 @@ def step(S, src, s, d, modif, dict, counter):
     for m in modif[ss[0]]:
         if m[0] <= idx:
             idx += m[1]
-    # for m in modif[dd[0]]:
-    #     if m[0] < ii:
-    #         ii += 1
 
     if ss[0] == dd[0] and idx == ii:
         if len(s) > 0:
@@ -125,7 +122,7 @@ def distance(source, destination):
     path = [source]
     counter = 0
     while path[-1] != destination and len(s) > 0:
-        nxt, ss, dd = step(source, first, s, d, modif, dict, counter)
+        nxt, ss, dd = step(source, first, s, d, modif, counter)
         if not nxt:
             s, d = ss, dd
             continue
@@ -144,7 +141,7 @@ def distance(source, destination):
     modif = [[] for _ in range(max(len(src), len(destination)))]
     counter = 0
     while p1[-1] != destination and len(s) > 0:
-        nxt, ss, dd = step(source, first, s, d, modif, dict, counter)
+        nxt, ss, dd = step(source, first, s, d, modif, counter)
         if not nxt:
             s, d = ss, dd
             continue
@@ -164,7 +161,7 @@ def distance(source, destination):
     modif = [[] for _ in range(max(len(src), len(destination)))]
     counter = 0
     while p1[-1] != destination and len(s) > 0:
-        nxt, ss, dd = step(source, first, s, d, modif, dict, counter)
+        nxt, ss, dd = step(source, first, s, d, modif, counter)
         if not nxt:
             s, d = ss, dd
             continue

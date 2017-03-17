@@ -25,52 +25,119 @@ def preprocess(source, destination):
 
     return ss,dd
 
-def step(S, src, s, d, push, pop):
+def step(S, src, s, d, modif, counter):
 
     ss = s.pop()
-
-    begin, end = ss[1], ss[2]
-
-    for i in push[ss[0]]:
-        begin += max(0,min(i[1], ss[1]) - i[0] + 1)
-        end += max(0,min(i[1],ss[2]) - i[0] + 1)
-
-    for i in pop[ss[0]]:
-        begin -= max(0, min(i[1], ss[1]) - i[0] + 1)
-        end -= max(0, min(i[1], ss[2]) - i[0] + 1)
-
+    idx, idx2 = ss[1], ss[2]
     dd = d.pop()
+    ii, ii2 = dd[1], dd[2]
 
-    if dd[0] == ss[0] and begin == dd[1] and end == dd[2]:
-        return None
+    for m in modif[ss[0]]:
+        if m[0] <= idx:
+            M = m[1] - m[0] + 1
+            idx += m[2]*M
+            idx2 += m[2]*M
+
+    if ss[0] == dd[0] and idx == ii and idx2 == ii2:
+        if len(s) > 0:
+            return counter+1, [ss] + s[0:],[dd] + d[0:]
+        return None, s, d
 
     while len(src) <= dd[0]:
         src.append([])
 
-    if ss[0] == dd[0] and begin < dd[1]:
-        push[dd[0]].append((dd[1]+1, dd[2]+1))
-    else:
-        push[dd[0]].append((dd[1], dd[2]))
+    if len(src[ss[0]]) == 0:
+        return None, s, d
 
-    pop[ss[0]].append((ss[1], ss[2]))
+    modif[ss[0]].append((idx, idx2, -1))
+    modif[dd[0]].append((ii, ii2, 1))
 
-    tmp = src[ss[0]][begin:end+1]
-    src[ss[0]] = src[ss[0]][:begin] + src[ss[0]][end+1:]
-    src[dd[0]] = src[dd[0]][:dd[1]] + tmp + src[dd[0]][dd[1]:]
+    tmp = src[ss[0]][idx:idx2+1]
+    src[ss[0]] = src[ss[0]][:idx]+src[ss[0]][idx2+1:]
+    lim = min(len(src[dd[0]]), ii)
+    src[dd[0]] = src[dd[0]][:lim]+tmp+src[dd[0]][lim:]
 
-    return src
+    return src, None, None
+
 
 def distance(source, destination):
 
     s,d = preprocess(source, destination)
-    push = [[]for _ in range(max(len(source),len(destination)))]
-    pop = [[]for _ in range(max(len(source),len(destination)))]
+    modif = [[]for _ in range(max(len(source),len(destination)))]
     first = [[c for c in r] for r in source]
     path = [source]
-    while len(s) > 0:
-        nxt = step(source, first, s, d, push, pop)
+    counter = 0
+    while path[-1] != destination and len(s) > 0:
+        nxt, ss, dd = step(source, first, s, d, modif, counter)
         if not nxt:
+            s, d = ss, dd
+            continue
+        if type(nxt)==int:
+            s, d = ss, dd
+            if nxt >= len(s):
+                break
+            counter = nxt
             continue
         first = [[c for c in r] for r in nxt]
         path.append([[c for c in r] for r in nxt if r != []])
+    src = path[-1]
+    p1 = [src]
+    s,d = preprocess(src, destination)
+    first = [[c for c in r] for r in src]
+    modif = [[] for _ in range(max(len(src), len(destination)))]
+    counter = 0
+    while p1[-1] != destination and len(s) > 0:
+        nxt, ss, dd = step(source, first, s, d, modif, counter)
+        if not nxt:
+            s, d = ss, dd
+            continue
+        if type(nxt) == int:
+            s, d = ss, dd
+            if nxt >= len(s):
+                break
+            counter = nxt
+            continue
+        first = [[c for c in r] for r in nxt]
+        p1.append([[c for c in r] for r in nxt if r != []])
+    path += p1
+    src = path[-1]
+    p1 = [src]
+    s, d = preprocess(src, destination)
+    first = [[c for c in r] for r in src]
+    modif = [[] for _ in range(max(len(src), len(destination)))]
+    counter = 0
+    while p1[-1] != destination and len(s) > 0:
+        nxt, ss, dd = step(source, first, s, d, modif, counter)
+        if not nxt:
+            s, d = ss, dd
+            continue
+        if type(nxt) == int:
+            s, d = ss, dd
+            if nxt >= len(s):
+                break
+            counter = nxt
+            continue
+        first = [[c for c in r] for r in nxt]
+        p1.append([[c for c in r] for r in nxt if r != []])
+    path += p1
+    src = path[-1]
+    p1 = [src]
+    s, d = preprocess(src, destination)
+    first = [[c for c in r] for r in src]
+    modif = [[] for _ in range(max(len(src), len(destination)))]
+    counter = 0
+    while p1[-1] != destination and len(s) > 0:
+        nxt, ss, dd = step(source, first, s, d, modif, counter)
+        if not nxt:
+            s, d = ss, dd
+            continue
+        if type(nxt) == int:
+            s, d = ss, dd
+            if nxt >= len(s):
+                break
+            counter = nxt
+            continue
+        first = [[c for c in r] for r in nxt]
+        p1.append([[c for c in r] for r in nxt if r != []])
+    path += p1
     return utils.clean_path(path)
