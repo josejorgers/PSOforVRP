@@ -11,7 +11,7 @@ for _ in range(1000):
         dest = random_sol(10)
         # print(src)
         # print(dest)
-        p = distances.distance(src,dest,'rdre')
+        p = distances.distance(src,dest,'rarb')
         if p[-1] != dest:
             print('An error has happened!!!')
             print(src)
