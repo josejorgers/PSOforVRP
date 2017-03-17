@@ -1,7 +1,7 @@
 import random, protocols
 from Distance import distances, utils
 
-choices = ['rarb','rarac','rdre']
+choices = ['rarb','rarac', 'rdre']
 
 class Particle:
 
@@ -77,7 +77,7 @@ def init(clients, N):
     return particles
 
 
-def pso(clients, N=10, iterations = 10):
+def pso(clients, N=100, iterations = 100):
     part = init(clients, N)
     opt=None
     for ss in part:

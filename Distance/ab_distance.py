@@ -85,13 +85,17 @@ def step(S, src, s, d, modif, dict, counter):
 
     ss = s.pop()
     idx = ss[1]
+    dd = d.pop()
+    ii = dd[1]
 
     for m in modif[ss[0]]:
         if m[0] <= idx:
             idx += m[1]
-    dd = d.pop()
+    # for m in modif[dd[0]]:
+    #     if m[0] < ii:
+    #         ii += 1
 
-    if ss[0] == dd[0] and idx == dd[1]:
+    if ss[0] == dd[0] and idx == ii:
         if len(s) > 0:
             return counter+1, [ss] + s[0:],[dd] + d[0:]
         return None, s, d
@@ -101,8 +105,6 @@ def step(S, src, s, d, modif, dict, counter):
 
     if len(src[ss[0]]) == 0:
         return None, s, d
-
-    ii = dd[1]
 
     modif[ss[0]].append((idx, -1))
     modif[dd[0]].append((ii, 1))
@@ -135,5 +137,45 @@ def distance(source, destination):
             continue
         first = [[c for c in r] for r in nxt]
         path.append([[c for c in r] for r in nxt if r != []])
+    src = path[-1]
+    p1 = [src]
+    s,d = preprocess(src, destination)
+    first = [[c for c in r] for r in src]
+    modif = [[] for _ in range(max(len(src), len(destination)))]
+    counter = 0
+    while p1[-1] != destination and len(s) > 0:
+        nxt, ss, dd = step(source, first, s, d, modif, dict, counter)
+        if not nxt:
+            s, d = ss, dd
+            continue
+        if type(nxt) == int:
+            s, d = ss, dd
+            if nxt >= len(s):
+                break
+            counter = nxt
+            continue
+        first = [[c for c in r] for r in nxt]
+        p1.append([[c for c in r] for r in nxt if r != []])
+    path += p1
+    src = path[-1]
+    p1 = [src]
+    s, d = preprocess(src, destination)
+    first = [[c for c in r] for r in src]
+    modif = [[] for _ in range(max(len(src), len(destination)))]
+    counter = 0
+    while p1[-1] != destination and len(s) > 0:
+        nxt, ss, dd = step(source, first, s, d, modif, dict, counter)
+        if not nxt:
+            s, d = ss, dd
+            continue
+        if type(nxt) == int:
+            s, d = ss, dd
+            if nxt >= len(s):
+                break
+            counter = nxt
+            continue
+        first = [[c for c in r] for r in nxt]
+        p1.append([[c for c in r] for r in nxt if r != []])
+    path += p1
     return utils.clean_path(path)
 
