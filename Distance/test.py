@@ -1,31 +1,24 @@
 from Distance import utils,distances
 from pso import random_sol
-# src = [[9, 7, 3], [6, 10, 1, 4, 5], [2, 8]]
-# dest = [[6, 7], [5, 8, 1, 10, 4, 9, 3], [2]]
-tests = 100
-c = 0
-e = 0
-for _ in range(1000):
-    while tests > 0:
-        src = random_sol(10)
-        dest = random_sol(10)
-        # print(src)
-        # print(dest)
-        p = distances.distance(src,dest,'rarb')
-        if p[-1] != dest:
-            print('An error has happened!!!')
-            print(src)
-            print(dest)
-            print(p[-1])
-            print('------------------------------')
-            c += 1
-        tests -= 1
-    print(c)
-    e+=c
-    c=0
-    tests = 100
-print(e/1000)
-## crit = 'raabrarbb'
+# src = [[2], [3], [1]]
+# dest = [[2, 1, 3]]
+d = 0
+for _ in range(10000):
+    src = random_sol(10)
+    dest = random_sol(10)
+    # print(src)
+    # print(dest)
+    p1 = distances.distance(src, dest, 'rdre')
+    if p1[-1] != dest:
+        print('Dummy is wrong!!!')
+        print(src)
+        print(dest)
+        print(p1[-1])
+        print('-------------------')
+        break
+    print(d)
+#
+# # crit = 'raabrarbb'
 
 #################################
 ####Testing the split_criteria###
@@ -55,7 +48,7 @@ print(e/1000)
 ##########################
 
 
-# p = distances.distance(src, dest, 'rarb')
+# p = distances.distance(src, dest, 'rdre')
 # print(src)
 # print(dest)
 # print(p[-1])
