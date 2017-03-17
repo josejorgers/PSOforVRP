@@ -1,6 +1,2 @@
-import protocols
 
-protocols.matrix = []
-protocols.vector = []
-
-print(protocols.objective_function(None))
+print((1,0) < (0,1))

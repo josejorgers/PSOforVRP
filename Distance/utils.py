@@ -1,5 +1,43 @@
 import random
 
+def sort(s, d):
+
+    for i in range(len(s)-1):
+        for j in range(i+1,len(s)):
+            if d[i][1] > d[j][1]:
+                s[i], s[j] = s[j], s[i]
+                d[i], d[j] = d[j], d[i]
+
+def go_vs_stay(go, stay, used, mark, s, d, init, dest):
+
+    counted = [False]*(len(mark))
+    lbl = False
+    counter = 0
+    for st in stay:
+        for m in mark[st]:
+            if used[m]:
+                lbl = True
+                break
+            if not counted[m]:
+                counter+=1
+                counted[m] = True
+
+        if lbl:
+            break
+    if lbl or counter <= len(stay):
+        for st in stay:
+            for m in mark[st]:
+                if not used[m]:
+                    s.append(init[m])
+                    d.append(dest[m])
+                    used[m] = True
+    else:
+        for st in stay:
+            if not used[st]:
+                s.append(init[st])
+                d.append(dest[st])
+                used[st] = True
+
 def is_rotation(r1, r2):
 
     if len(r1) != len(r2):
@@ -29,7 +67,8 @@ def clean_path(path):
 
 def make_set(destination):
 
-    s = {}
+    M = max([max(r) for r in destination if r != []])
+    s = [-1]*(M+1)
 
     for i in range(len(destination)):
         for j in range(len(destination[i])):

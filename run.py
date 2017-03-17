@@ -3,7 +3,7 @@ import pso, protocols
 import random
 if __name__ == '__main__':
 
-    clients = 100#int(input('Number of clients: ' ))
+    clients = 10#int(input('Number of clients: ' ))
     demands = [0]
 
     for c in range(clients):

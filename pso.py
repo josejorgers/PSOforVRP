@@ -77,7 +77,7 @@ def init(clients, N):
     return particles
 
 
-def pso(clients, N=100, iterations = 100):
+def pso(clients, N=10, iterations = 10):
     part = init(clients, N)
     opt=None
     for ss in part:
