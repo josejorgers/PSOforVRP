@@ -1,4 +1,5 @@
 from Distance import definitions
+import queue, random
 
 def split_criteria(criteria):
 
@@ -39,7 +40,7 @@ def make_set(destination):
 
     return s
 
-def get_source(source, destination):
+def parse_solutions(source, destination):
 
     src = []
     s = make_set(destination)
@@ -55,17 +56,34 @@ def get_source(source, destination):
 
     return src
 
-def parse_solutions(source, destination):
-    return get_source(source,destination)
-
 def build_new_sol(src, changes):
 
     M = max(map(max, src))
-    new = [[0]*M]*M
+    new = [[-1 for _ in range(M)]for _ in range(M)]
+    used = [[False for _ in range(M)]for _ in range(M)]
 
-    for k in changes.keys():
-        val = changes[k]
-        new[val[0]][val[1]] = src[k[0]][k[1]]
+    for k in changes:
+        new[k[1][0]][k[1][1]] = src[k[0][0]][k[0][1]]
+        used[k[0][0]][k[0][1]] = True
+
+    for r in range(len(src)):
+        for i in range(len(src[r])):
+            if i < len(src[r])-1 and used[r][i]:
+                src[r][i] = src[r][i+1]
+                #Must be changed when including more complex criteria
+                #since could be more than one used client in consecutive positions
+                used[r][i] = False
+                used[r][i+1] = True
+
+    for i in range(len(src)):
+        idx = 0
+        for j in range(len(src[i])):
+            if used[i][j]:
+                continue
+            while new[i][idx] != -1:
+                idx+=1
+            new[i][idx] = src[i][j]
+            idx+=1
 
     return new
 
@@ -78,51 +96,83 @@ def count_inserts(sol):
 
     routes = [0]*len(sol)
 
-    for r in range(len(sol)):
-        for t in sol[r]:
-            if t[0] != r:
+    for i in range(len(sol)):
+        for t in sol[i]:
+            if t[0] != i:
                 routes[t[0]] += 1
     return routes
 
-def count_inverts(sol):
+def count_inverts(sol, i):
     '''
     Counts hay many inversions must be done for every route.
     :param sol:
     :return:
     '''
-    routes = [0]*len(sol)
+    routes = 0
+    dict = {}
+    q = queue.Queue()
 
-    for i in range(len(sol)):
-        for j in range(len(sol[i])-1):
-            for k in range(1,len(sol[i])):
-                if sol[i][j][0] == i and sol[i][k][0] == i and sol[i][j][1] > sol[i][k][1]:
-                    routes[i] += 1
-    return routes
+    for j in range(len(sol[i])-1):
+        for k in range(j+1,len(sol[i])):
+            if sol[i][k] == (i,j):
+                routes += 1
+                dict[sol[i][j]] = (i,j)
+                q.put_nowait(sol[i][j])
+
+    return routes, q, dict
 
 
-def count_departs(sol):
+def count_departs(sol, i):
     '''
     Counts how many departures must be done for every route.
     :param sol:
     :return:
     '''
 
-    routes = [0] * len(sol)
+    routes = 0
+    dict = {}
+    q = queue.Queue()
 
-    for r in range(len(sol)):
-        for t in sol[r]:
-            if t[0] != r:
-                routes[r] += 1
-    return routes
+    for t in range(len(sol[i])):
+        if sol[i][t][0] != i:
+            routes += 1
+            dict[sol[i][t]] = (i,t)
+            q.put_nowait(sol[i][t])
+
+    return routes, q, dict
 
 def parse_routes(sol):
 
-    dep = count_departs(sol)
-    inv = count_inverts(sol)
+
     ins = count_inserts(sol)
 
     routes = []
-    for i in range(len(dep)):
-        routes.append(definitions.Route(inv[i],dep[i],ins[i]))
+
+    for i in range(len(sol)):
+        dep, q1, dict1 = count_departs(sol, i)
+        inv, q2, dict2 = count_inverts(sol, i)
+
+        dict1.update(dict2)
+
+        routes.append(definitions.ClientRoute(inv,dep,ins[i],q1,q2,dict1))
 
     return routes
+
+def clean_solution(sol):
+    routes = [[i for i in r if i != -1] for r in  sol]
+    return [r for r in routes if len(r) > 0]
+
+# def apply_rarb(sol):
+#
+#     r1 = random.randint(0,len(sol))
+#     r2 = random.randint(0,len(sol))
+#
+#     idx1 = random.randint(0, len(sol[r1]))
+#     idx2 = random.randint(0, len(sol[r2]))
+#
+#     tmp = sol[r1][idx1]
+#
+#     sol[r1] = sol[r1][:idx1] + sol[min(idx1,len(sol[r1])-2)+1:len(sol[r1])]
+#     sol[r2] = sol[:min(idx2,len(sol[r2])-1)+1] + [tmp] + sol[min(idx2,len(sol[r2])-2)+1:len(sol[r2])]
+#
+#     return [[c for c in r] for r in sol]

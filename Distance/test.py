@@ -1,7 +1,7 @@
-from Distance import utils
+from Distance import utils,distances
 
-src = [[1,2],[3],[4,5]]
-dest = [[1,2,3],[4,5]]
+dest = [[i for i in range(1,201)]]
+src =  [[i for i in range(200,0,-1)]]
 crit = 'raabrarbb'
 
 #################################
@@ -27,3 +27,8 @@ crit = 'raabrarbb'
 #     print(r.get_insertions)
 #     print('------------------')
 
+##########################
+###Testing the distance###
+##########################
+# p = distances.ab_distance(src, dest)
+# print(p)
