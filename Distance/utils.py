@@ -1,5 +1,5 @@
 from Distance import definitions
-import queue, random
+import queue
 
 def split_criteria(criteria):
 

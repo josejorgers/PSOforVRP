@@ -1,7 +1,7 @@
 from Distance import utils,distances
 
-dest = [[i for i in range(1,201)]]
-src =  [[i for i in range(200,0,-1)]]
+dest = [[3,2],[1]]#[[i for i in range(1,201)]]
+src =  [[1],[2],[3]]#[[i for i in range(200,0,-1)]]
 crit = 'raabrarbb'
 
 #################################
@@ -30,5 +30,5 @@ crit = 'raabrarbb'
 ##########################
 ###Testing the distance###
 ##########################
-# p = distances.ab_distance(src, dest)
-# print(p)
+p = distances.distance(src, dest, 'rarb')
+print(p)
