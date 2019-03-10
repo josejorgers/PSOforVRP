@@ -5,12 +5,14 @@ def preprocess(source, destination):
     src = utils.parse_solutions(source, destination)
     s,d = [],[]
 
+    #Route changes
     for i in range(len(src)):
         for j in range(len(src[i])):
             if i != src[i][j][0]:
                 s.append((i,j))
                 d.append(src[i][j])
 
+    #Inversions
     for i in range(len(src)):
         for j in range(len(src[i])-1):
             for k in range(j+1,len(src[i])):
@@ -18,11 +20,6 @@ def preprocess(source, destination):
                     s.append((i,j))
                     d.append(src[i][j])
                     break
-    for i in range(len(s)-1):
-        for j in range(i+1, len(s)):
-            if s[i][1] < d[j][1] or (d[i][1] < d[j][1] and s[i][1] < s[j][1]):
-                s[i], s[j] = s[j], s[i]
-                d[i], d[j] = d[j], d[i]
     return s,d
 
 def step(S, src, s, d, push, pop):

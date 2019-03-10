@@ -3,11 +3,12 @@ from Distance import distances, utils
 
 class Particle:
 
-    def __init__(self, solution, criteria = 'rarb'):
+    def __init__(self, solution, criteria = 'rarb', vrange=20):
         self.solution = [[c for c in r] for r in solution]
         self.criteria = criteria
         self.own_best = [[c for c in r] for r in solution]
-        self.v = random.randint(1,10)
+        self.vrange = vrange
+        self.v = random.randint(1,vrange)
 
     def edit_solution(self,sol):
 
@@ -28,13 +29,13 @@ class Particle:
         path = distances.distance(self.solution,target, self.criteria)
         new_sol = path[min(self.v, len(path)-1)]
 
-        #TODO: Add the apply_rarb function to pass through the target.
-        # if self.v > len(target):
-        #     n = self.v-len(target)
-        #     for i in range(n):
-        #         new_sol = utils.apply_rarb(self.solution)
+        if self.v > len(target):
+            n = self.v-len(target)
+            for i in range(n):
+                tmp = [[c for c in r] for r in new_sol]
+                new_sol = utils.apply_rarb(tmp)
 
-        self.v = random.randint(1,10)
+        self.v = random.randint(1,self.vrange)
         self.solution = self.edit_solution(new_sol)
 
         return self.solution
@@ -45,7 +46,7 @@ def take_slice(l, first, end):
     return l[first:r]
 
 def random_sol(clients):
-    routes = random.randint(2,clients) #CHANGE 2 for 1!!!!
+    routes = random.randint(1,clients)
     l = [i for i in range(1,clients+1)]
     random.shuffle(l)
     sol = [[] for _ in range(routes)]
@@ -67,26 +68,21 @@ def init(clients, N):
     return particles
 
 
-def pso(clients, N=3, iterations = 3):
+def pso(clients, N=100, iterations = 100):
     part = init(clients, N)
     opt=None
-    m, M = 10000, 0
     for ss in part:
         s = ss.solution
-        m = min(m,len(s))
-        M = max(M,len(s))
         if not opt or protocols.objective_function(s) < protocols.objective_function(opt):
             opt = [[c for c in r] for r in s]
-    print(m)
-    print(M)
-    ch = False
     it = iterations
+
+    print(protocols.objective_function(opt))
+
     while it > 0:
         for p in part:
             s = p.move(opt)
             if protocols.objective_function(s) < protocols.objective_function(opt):
                 opt = [[c for c in r]for r in s]
-                ch = True
         it-=1
-    print(ch)
     return opt
