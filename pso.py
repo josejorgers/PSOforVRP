@@ -76,7 +76,7 @@ def random_sol(clients):
 def init(clients, N):
     particles = []
     for s in range(N):
-        particles.append(Particle(random_sol(clients), random.choice(choices)))
+        particles.append(Particle(random_sol(clients), random.choice(choices), vrange=clients))
     return particles
 
 

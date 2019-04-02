@@ -1,7 +1,7 @@
 import random
 
 def codify(perm):
-    M = max([max(r) for r in perm])
+    M = max([max(r) for r in perm if r != []])
     code = [-1]*(M+1)
     c = 0
     for i in range(len(perm)):
@@ -68,7 +68,7 @@ def clean_path(path):
 
 def make_set(destination):
 
-    M = max([max(r) for r in destination])
+    M = max([max(r) for r in destination if r != []])
     s = [-1]*(M+1)
 
     for i in range(len(destination)):
